@@ -20,4 +20,8 @@ app.get('/', (req, res) => {
     res.send('SupportDesk API Running');
 });
 
+const authRoutes = require('./routes/authRoutes');
+
+app.use('/api/auth', authRoutes);
+
 module.exports = app;
