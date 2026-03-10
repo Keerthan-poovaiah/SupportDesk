@@ -3,6 +3,9 @@ const cors = require('cors');
 require('dotenv').config();
 const pool = require('./config/db');
 
+const authRoutes = require('./routes/authRoutes');
+const ticketRoutes = require('./routes/ticketRoutes');
+
 const app = express();
 
 app.use(cors());
@@ -20,8 +23,7 @@ app.get('/', (req, res) => {
     res.send('SupportDesk API Running');
 });
 
-const authRoutes = require('./routes/authRoutes');
-
 app.use('/api/auth', authRoutes);
+app.use('/api/tickets', ticketRoutes);
 
 module.exports = app;
