@@ -12,9 +12,19 @@ function TicketDetails() {
 
   useEffect(() => {
 
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+
+    navigate("/");
+
+  } else {
+
     fetchTicket();
 
-  }, []);
+  }
+
+}, []);
 
   const fetchTicket = async () => {
 

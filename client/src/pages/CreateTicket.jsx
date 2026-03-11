@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,16 @@ function CreateTicket() {
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("MEDIUM");
 
+  useEffect(() => {
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/");
+    }
+
+  }, []);
+  
   const handleSubmit = async () => {
 
     try {

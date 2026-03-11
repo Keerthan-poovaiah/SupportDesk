@@ -10,9 +10,19 @@ function Dashboard() {
 
   useEffect(() => {
 
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+
+    navigate("/");
+
+  } else {
+
     fetchTickets();
 
-  }, []);
+  }
+
+}, []);
 
   const fetchTickets = async () => {
 
@@ -36,11 +46,23 @@ function Dashboard() {
 
   };
 
+  const handleLogout = () => {
+
+  localStorage.removeItem("token");
+
+  navigate("/");
+
+};
+
   return (
 
     <div>
 
       <h2>Dashboard</h2>
+
+      <button onClick={handleLogout}>
+      Logout
+      </button>
 
       <button onClick={() => navigate("/create-ticket")}>
         Create Ticket
