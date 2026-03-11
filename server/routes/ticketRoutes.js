@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-const { createTicket } = require('../controllers/ticketController');
 const authMiddleware = require('../middleware/authMiddleware');
+
+const { createTicket } = require('../controllers/ticketController');
 const { getTickets } = require('../controllers/ticketController');
+const { updateTicketStatus } = require('../controllers/ticketController');
 
 router.post('/', authMiddleware, createTicket);
 router.get('/', authMiddleware, getTickets);
+router.patch('/:id/status', authMiddleware, updateTicketStatus);
 
 module.exports = router;

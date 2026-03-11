@@ -80,3 +80,46 @@ exports.getTickets = async (req, res) => {
     }
 
 };
+
+
+exports.updateTicketStatus = async (req, res) => {
+
+    try {
+
+        const ticketId = req.params.id;
+        const { status } = req.body;
+        const role = req.user.role;
+
+        if (role === "customer") {
+            return res.status(403).json({
+                message: "Customers cannot update ticket status"
+            });
+        }
+
+        const query = `
+        UPDATE tickets
+        SET status = $1
+        WHERE id = $2
+        RETURNING *
+        `;
+
+        const values = [status, ticketId];
+
+        const result = await pool.query(query, values);
+
+        res.json({
+            message: "Ticket status updated",
+            ticket: result.rows[0]
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "Server error"
+        });
+
+    }
+
+};

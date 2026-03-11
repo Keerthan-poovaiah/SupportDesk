@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 exports.registerUser = async (req, res) => {
     try {
@@ -29,8 +30,6 @@ exports.registerUser = async (req, res) => {
     }
 };
 
-
-const jwt = require('jsonwebtoken');
 
 exports.loginUser = async (req, res) => {
 

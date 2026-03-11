@@ -5,6 +5,7 @@ const pool = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
+const commentRoutes = require('./routes/commentRoutes');
 
 const app = express();
 
@@ -25,5 +26,6 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tickets', ticketRoutes);
+app.use('/api/tickets', commentRoutes);
 
 module.exports = app;
