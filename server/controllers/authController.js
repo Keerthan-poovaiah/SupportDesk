@@ -1,11 +1,20 @@
 const pool = require('../config/db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { registerSchema, loginSchema } = require('../validation/authValidation');
 
 exports.registerUser = async (req, res) => {
     try {
 
         const { name, email, password } = req.body;
+
+        const { error } = registerSchema.validate(req.body);
+
+        if (error) {
+            return res.status(400).json({
+                message: error.details[0].message
+            });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -36,6 +45,14 @@ exports.loginUser = async (req, res) => {
     try {
 
         const { email, password } = req.body;
+
+        const { error } = loginSchema.validate(req.body);
+
+        if (error) {
+            return res.status(400).json({
+                message: error.details[0].message
+            });
+        }
 
         const query = "SELECT * FROM users WHERE email = $1";
 

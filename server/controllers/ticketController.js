@@ -1,10 +1,19 @@
 const pool = require('../config/db');
+const { createTicketSchema } = require('../validation/ticketValidation');
 
 exports.createTicket = async (req, res) => {
 
     try {
 
         const { title, description, priority } = req.body;
+
+        const { error } = createTicketSchema.validate({ title, description, priority });
+
+        if (error) {
+            return res.status(400).json({
+                message: error.details[0].message
+            });
+        }
 
         const customerId = req.user.userId;
 
