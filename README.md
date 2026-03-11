@@ -189,28 +189,6 @@ Pages implemented:
 
 ### Backend
 
----
-
-## Frontend
-
-The frontend is intentionally kept simple and minimal.
-
-Its purpose is only to **demonstrate interaction with the backend APIs** and allow basic testing of the system.
-
-Pages implemented:
-
-• Login  
-• Register  
-• Dashboard (list tickets)  
-• Create Ticket  
-• Ticket Details
-
----
-
-## Running the Project
-
-### Backend
-
 cd server
 npm install
 npm run dev
