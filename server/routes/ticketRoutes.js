@@ -7,10 +7,12 @@ const { createTicket } = require('../controllers/ticketController');
 const { getTickets } = require('../controllers/ticketController');
 const { updateTicketStatus } = require('../controllers/ticketController');
 const { getTicketDetails } = require('../controllers/ticketController');
+const { assignTicket } = require('../controllers/ticketController');
 
 router.post('/', authMiddleware, createTicket);
 router.get('/', authMiddleware, getTickets);
 router.patch('/:id/status', authMiddleware, updateTicketStatus);
 router.get('/:id', authMiddleware, getTicketDetails);
+router.patch('/:id/assign', authMiddleware, assignTicket);
 
 module.exports = router;
