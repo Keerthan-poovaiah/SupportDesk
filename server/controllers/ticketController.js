@@ -123,3 +123,45 @@ exports.updateTicketStatus = async (req, res) => {
     }
 
 };
+
+
+exports.getTicketDetails = async (req, res) => {
+
+    try {
+
+        const ticketId = req.params.id;
+
+        const ticketQuery = `
+        SELECT * FROM tickets
+        WHERE id = $1
+        `;
+
+        const ticketResult = await pool.query(ticketQuery, [ticketId]);
+
+        const commentsQuery = `
+        SELECT ticket_comments.message, users.name, ticket_comments.created_at
+        FROM ticket_comments
+        JOIN users
+        ON ticket_comments.user_id = users.id
+        WHERE ticket_comments.ticket_id = $1
+        ORDER BY ticket_comments.created_at
+        `;
+
+        const commentsResult = await pool.query(commentsQuery, [ticketId]);
+
+        res.json({
+            ticket: ticketResult.rows[0],
+            comments: commentsResult.rows
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            message: "Server error"
+        });
+
+    }
+
+};
