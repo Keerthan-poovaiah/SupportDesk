@@ -20,7 +20,9 @@ function TicketDetails() {
   useEffect(() => {
 
     const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const storedUser = localStorage.getItem("user");
+
+    const user = storedUser ? JSON.parse(storedUser) : {};
 
     if (!token) {
       navigate("/");
