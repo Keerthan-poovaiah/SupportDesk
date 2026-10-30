@@ -16,6 +16,7 @@ function TicketDetails() {
   const [userRole, setUserRole] = useState("");
   const [agents, setAgents] = useState([]);
   const [selectedAgent, setSelectedAgent] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
    
   useEffect(() => {
 
@@ -96,6 +97,47 @@ const assignTicket = async () => {
       alert(
         error.response?.data?.message ||
         "Failed to assign ticket"
+      );
+
+    }
+
+};
+
+const updateTicketStatus = async () => {
+
+    if (!selectedStatus) {
+      alert("Please select a status");
+      return;
+    }
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const res = await api.patch(
+        `/tickets/${id}/status`,
+        {
+          status: selectedStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert(res.data.message);
+
+      setSelectedStatus("");
+      fetchTicket();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        error.response?.data?.message ||
+        "Failed to update ticket status"
       );
 
     }
@@ -218,48 +260,81 @@ const assignTicket = async () => {
 
           {userRole === "admin" && (
 
-  <div className="mt-10 mb-12 bg-zinc-800 border border-zinc-700 rounded-2xl p-6">
+          <div className="mt-10 mb-12 bg-zinc-800 border border-zinc-700 rounded-2xl p-6">
 
-    <h2 className="text-2xl font-semibold mb-5">
-      Assign Ticket
-    </h2>
+            <h2 className="text-2xl font-semibold mb-5">
+              Assign Ticket
+            </h2>
 
-    <p className="text-gray-400 mb-4">
-      Select an agent to assign this ticket.
-    </p>
+            <p className="text-gray-400 mb-4">
+              Select an agent to assign this ticket.
+            </p>
 
-    <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
 
-      <select
-        value={selectedAgent}
-        onChange={(e) => setSelectedAgent(e.target.value)}
-        className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl p-4 outline-none"
-      >
+              <select
+                value={selectedAgent}
+                onChange={(e) => setSelectedAgent(e.target.value)}
+                className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl p-4 outline-none"
+              >
 
-        <option value="">Select an agent</option>
+                <option value="">Select an agent</option>
 
-        {agents.map((agent) => (
+                {agents.map((agent) => (
 
-          <option key={agent.id} value={agent.id}>
-            {agent.name} ({agent.email})
-          </option>
+                  <option key={agent.id} value={agent.id}>
+                    {agent.name} ({agent.email})
+                  </option>
 
-        ))}
+                ))}
 
-      </select>
+              </select>
 
-      <button
-        className="bg-white text-black px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition"
-        onClick={assignTicket}
-      >
-        Assign Ticket
-      </button>
+              <button
+                className="bg-white text-black px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition"
+                onClick={assignTicket}
+              >
+                Assign Ticket
+              </button>
 
-    </div>
+            </div>
 
-  </div>
+          </div>
 
-)}
+        )}
+
+        {(userRole === "admin" || userRole === "agent") && (
+
+          <div className="mt-10 mb-12 bg-zinc-800 border border-zinc-700 rounded-2xl p-6">
+
+            <h2 className="text-2xl font-semibold mb-5">
+              Update Ticket Status
+            </h2>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+
+              <select
+                value={selectedStatus || ticket.status}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl p-4 outline-none"
+              >
+                <option value="OPEN">OPEN</option>
+                <option value="IN_PROGRESS">IN PROGRESS</option>
+                <option value="RESOLVED">RESOLVED</option>
+              </select>
+
+              <button
+                onClick={updateTicketStatus}
+                className="bg-white text-black px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition"
+              >
+                Update Status
+              </button>
+
+            </div>
+
+          </div>
+
+        )}
 
           <div className="mt-12">
 

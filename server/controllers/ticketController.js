@@ -128,27 +128,54 @@ exports.updateTicketStatus = async (req, res) => {
 
         const ticketId = req.params.id;
         const { status } = req.body;
-        const role = req.user.role;
+        const { userId, role } = req.user;
 
-        if (role === "customer") {
-            return res.status(403).json({
-                message: "Customers cannot update ticket status"
+        const allowedStatuses = ["OPEN", "IN_PROGRESS", "RESOLVED"];
+
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({
+                message: "Invalid ticket status"
             });
         }
 
-        const query = `
-        UPDATE tickets
-        SET status = $1
-        WHERE id = $2
-        RETURNING *
-        `;
+        if (role !== "admin" && role !== "agent") {
+            return res.status(403).json({
+                message: "You are not authorized to update ticket status"
+            });
+        }
 
-        const values = [status, ticketId];
+        const ticketResult = await pool.query(
+            "SELECT * FROM tickets WHERE id = $1",
+            [ticketId]
+        );
 
-        const result = await pool.query(query, values);
+        if (ticketResult.rows.length === 0) {
+            return res.status(404).json({
+                message: "Ticket not found"
+            });
+        }
+
+        const ticket = ticketResult.rows[0];
+
+        if (
+            role === "agent" &&
+            ticket.assigned_agent_id !== userId
+        ) {
+            return res.status(403).json({
+                message: "You can only update tickets assigned to you"
+            });
+        }
+
+        const result = await pool.query(
+            `UPDATE tickets
+             SET status = $1
+             WHERE id = $2
+             RETURNING *`,
+            [status, ticketId]
+        );
 
         res.json({
-            message: "Ticket status updated",
+            message: "Ticket status updated successfully",
             ticket: result.rows[0]
         });
 
