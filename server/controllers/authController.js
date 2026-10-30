@@ -82,7 +82,13 @@ exports.loginUser = async (req, res) => {
 
         res.json({
             message: "Login successful",
-            token
+            token,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
         });
 
     } catch (error) {
@@ -95,4 +101,32 @@ exports.loginUser = async (req, res) => {
 
     }
 
+};
+
+exports.getAgents = async (req, res) => {
+    try {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({
+                message: "Only admins can view agents"
+            });
+        }
+
+        const result = await pool.query(
+            `SELECT id, name, email
+             FROM users
+             WHERE role = 'agent'
+             ORDER BY name`
+        );
+
+        res.json({
+            agents: result.rows
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            message: "Server error"
+        });
+    }
 };

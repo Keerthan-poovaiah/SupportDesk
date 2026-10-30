@@ -12,21 +12,93 @@ function TicketDetails() {
   const [comments, setComments] = useState([]);
   const [message, setMessage] = useState("");
 
+
+  const [userRole, setUserRole] = useState("");
+  const [agents, setAgents] = useState([]);
+  const [selectedAgent, setSelectedAgent] = useState("");
+   
   useEffect(() => {
 
     const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
 
     if (!token) {
-
       navigate("/");
+      return;
+    }
 
-    } else {
+    setUserRole(user.role || "");
 
-      fetchTicket();
+    fetchTicket();
+
+    if (user.role === "admin") {
+      fetchAgents();
+    }
+
+}, []);
+
+const fetchAgents = async () => {
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const res = await api.get("/auth/agents", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setAgents(res.data.agents);
+
+    } catch (error) {
+
+      console.error("Failed to fetch agents", error);
+      alert("Failed to fetch agents");
 
     }
 
-  }, []);
+};
+
+const assignTicket = async () => {
+
+    if (!selectedAgent) {
+      alert("Please select an agent");
+      return;
+    }
+
+    try {
+
+      const token = localStorage.getItem("token");
+
+      const res = await api.patch(
+        `/tickets/${id}/assign`,
+        {
+          agentId: Number(selectedAgent),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      alert(res.data.message);
+
+      fetchTicket();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        error.response?.data?.message ||
+        "Failed to assign ticket"
+      );
+
+    }
+
+};
 
   const fetchTicket = async () => {
 
@@ -141,6 +213,51 @@ function TicketDetails() {
             </span>
 
           </div>
+
+          {userRole === "admin" && (
+
+  <div className="mt-10 mb-12 bg-zinc-800 border border-zinc-700 rounded-2xl p-6">
+
+    <h2 className="text-2xl font-semibold mb-5">
+      Assign Ticket
+    </h2>
+
+    <p className="text-gray-400 mb-4">
+      Select an agent to assign this ticket.
+    </p>
+
+    <div className="flex flex-col sm:flex-row gap-4">
+
+      <select
+        value={selectedAgent}
+        onChange={(e) => setSelectedAgent(e.target.value)}
+        className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl p-4 outline-none"
+      >
+
+        <option value="">Select an agent</option>
+
+        {agents.map((agent) => (
+
+          <option key={agent.id} value={agent.id}>
+            {agent.name} ({agent.email})
+          </option>
+
+        ))}
+
+      </select>
+
+      <button
+        className="bg-white text-black px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition"
+        onClick={assignTicket}
+      >
+        Assign Ticket
+      </button>
+
+    </div>
+
+  </div>
+
+)}
 
           <div className="mt-12">
 
